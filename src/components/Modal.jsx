@@ -31,6 +31,7 @@ import BasicComponent from './BasicComponent.jsx';
 class Modal extends BasicComponent {
   constructor(props, context) {
     super(props, context);
+    this.updateDisplay = this.updateDisplay.bind(this);
     this.node = null;
   }
 
@@ -38,22 +39,28 @@ class Modal extends BasicComponent {
     super.componentDidMount();
     this.node = ReactDOM.findDOMNode(this);
     CustomElements.upgrade(this.node);
+    this.updateDisplay(this.props);
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.isOpen !== this.props.isOpen) {
-      const animationOptions = {
-        animation: nextProps.animation,
-        animationOptions: nextProps.animationOptions
-      };
-      // The resolve argument provided by show and hide promises is a reference
-      // to the internal ons-modal that should not be passed to the onShow and
-      // onHide hooks on the React component.
-      if (nextProps.isOpen) {
-        this.node.show(animationOptions).then(() => nextProps.onShow && nextProps.onShow());
-      } else {
-        this.node.hide(animationOptions).then(() => nextProps.onHide && nextProps.onHide());
-      }
+      this.updateDisplay(nextProps);
+    }
+  }
+
+  updateDisplay(props) {
+    console.log('update display');
+    const animationOptions = {
+      animation: props.animation,
+      animationOptions: props.animationOptions
+    };
+    // The resolve argument provided by show and hide promises is a reference
+    // to the internal ons-modal that should not be passed to the onShow and
+    // onHide hooks on the React component.
+    if (props.isOpen) {
+      this.node.show(animationOptions).then(() =>{props.onShow && props.onShow() });
+    } else {
+      this.node.hide(animationOptions).then(() => props.onHide && props.onHide());
     }
   }
 
